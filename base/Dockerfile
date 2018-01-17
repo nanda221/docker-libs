@@ -31,19 +31,23 @@ RUN mkdir /var/run/sshd
 RUN echo 'root:hello1234' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
-RUN echo '#!/bin/bash\n/usr/sbin/sshd' >> /root/sshd.sh && chmod 755 /root/sshd.sh
+RUN echo '/usr/sbin/sshd' >> /root/sshd.sh && chmod 755 /root/sshd.sh
 
 # 安装nginx
 RUN apt-get install -y nginx
 COPY nginx.conf /etc/nginx/nginx.conf
-RUN echo "nginx -c /etc/nginx/nginx.conf -g  'daemon off;'" >> /root/nginx.sh && chmod 755 /root/nginx.sh
-# RUN echo "#!/bin/bash\n/usr/sbin/sshd\nnginx -c /etc/nginx/nginx.conf -g  'daemon off;'" >> /root/bootstrap.sh && chmod 755 /root/bootstrap.sh
+RUN echo "nginx -c /etc/nginx/nginx.conf -g 'daemon off;'" >> /root/nginx.sh && chmod 755 /root/nginx.sh
+RUN echo "nginx -c /etc/nginx/nginx.conf" >> /root/nginx-daemon.sh && chmod 755 /root/nginx-daemon.sh
 
-RUN cat /root/sshd.sh /root/nginx.sh >> /root/bootstrap.sh && chmod 755 /root/bootstrap.sh
+# 切换到root下
+WORKDIR /root
+# 生成启动文件
+RUN cat sshd.sh nginx.sh > bootstrap.sh && chmod 755 bootstrap.sh
 
-ENTRYPOINT ["/root/bootstrap.sh"]
+# 由于`bootstrap.sh`没有#!/bin/bash header，此处/bin/bash不可少，强制指定以shell的方式运行
+ENTRYPOINT ["/bin/bash", "/root/bootstrap.sh"]
 
-EXPOSE 22
+EXPOSE 22 80
 
 # For test below:
 #   Build: "docker build -t base:1.0 ."

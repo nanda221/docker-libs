@@ -18,7 +18,9 @@ RUN gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org
 # bundler over gems, see http://bundler.io/
 RUN gem install bundler
 
-ENTRYPOINT ["/root/bootstrap.sh"]
+# 使用默认启动文件
+
+ENTRYPOINT ["/bin/bash", "/root/bootstrap.sh"]
 
 # manipulation below:
 #   Build: "docker build -t ruby:2.3 ."
