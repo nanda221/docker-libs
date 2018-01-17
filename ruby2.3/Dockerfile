@@ -12,6 +12,12 @@ RUN apt-get install -y ruby-dev
 # 已在base主镜像中安装
 # RUN apt-get install -y build-essential
 
+# 替换国内源
+RUN gem sources --add https://gems.ruby-china.org/ --remove https://rubygems.org/
+
+# bundler over gems, see http://bundler.io/
+RUN gem install bundler
+
 ENTRYPOINT ["/root/bootstrap.sh"]
 
 # manipulation below:

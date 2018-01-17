@@ -25,15 +25,21 @@ RUN apt-get install -y net-tools vim-tiny
 # 安装gcc make等编译、打包工具
 RUN apt-get install -y build-essential
 
-
+# 安装ssh
 RUN apt-get install -y openssh-server
 RUN mkdir /var/run/sshd
 RUN echo 'root:hello1234' | chpasswd
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-
 RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+RUN echo '#!/bin/bash\n/usr/sbin/sshd' >> /root/sshd.sh && chmod 755 /root/sshd.sh
 
-RUN echo '#!/bin/bash\n/usr/sbin/sshd -D' >> /root/bootstrap.sh && chmod 755 /root/bootstrap.sh
+# 安装nginx
+RUN apt-get install -y nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+RUN echo "nginx -c /etc/nginx/nginx.conf -g  'daemon off;'" >> /root/nginx.sh && chmod 755 /root/nginx.sh
+# RUN echo "#!/bin/bash\n/usr/sbin/sshd\nnginx -c /etc/nginx/nginx.conf -g  'daemon off;'" >> /root/bootstrap.sh && chmod 755 /root/bootstrap.sh
+
+RUN cat /root/sshd.sh /root/nginx.sh >> /root/bootstrap.sh && chmod 755 /root/bootstrap.sh
 
 ENTRYPOINT ["/root/bootstrap.sh"]
 
@@ -41,6 +47,6 @@ EXPOSE 22
 
 # For test below:
 #   Build: "docker build -t base:1.0 ."
-#   Run And Listen: "docker run -d -p 10012:22 base:1.0"
+#   Run And Listen: "docker run -d -p 10012:22 -p 8080:80 base:1.0"
 #   Connect: "ssh root@0.0.0.0 -p 10012"
 #   Check port listened in container: "netstat -tunlp"

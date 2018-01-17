@@ -8,7 +8,7 @@ LABEL maintainer=nandaman221@gmail.com
 
 
 # reference: https://askubuntu.com/questions/865554/how-do-i-install-python-3-6-using-apt-get
-# ubuntu17.07 apt源已包含python3.6
+# ubuntu17.07 apt源已包含python3.5
 RUN apt-get update
 RUN apt-get install -y python3.6 \
 python3-pip
