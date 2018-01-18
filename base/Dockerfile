@@ -19,12 +19,6 @@ LABEL maintainer=nandaman221@gmail.com
 # 因更新滞后，取消了国内apt源加速(python3.6等包国内源没有)
 RUN apt-get update
 
-# 调试工具
-RUN apt-get install -y net-tools vim-tiny
-
-# 安装gcc make等编译、打包工具
-RUN apt-get install -y build-essential
-
 # 安装ssh
 RUN apt-get install -y openssh-server
 RUN mkdir /var/run/sshd
@@ -38,6 +32,12 @@ RUN apt-get install -y nginx
 COPY nginx.conf /etc/nginx/nginx.conf
 RUN echo "nginx -c /etc/nginx/nginx.conf -g 'daemon off;'" >> /root/nginx.sh && chmod 755 /root/nginx.sh
 RUN echo "nginx -c /etc/nginx/nginx.conf" >> /root/nginx-daemon.sh && chmod 755 /root/nginx-daemon.sh
+
+# 安装各种工具
+RUN apt-get install -y net-tools vim-tiny curl
+
+# 安装gcc make等编译、打包工具
+RUN apt-get install -y build-essential
 
 # 切换到root下
 WORKDIR /root

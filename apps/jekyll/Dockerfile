@@ -11,8 +11,8 @@ COPY nginx.conf /etc/nginx/nginx.conf
 # 切换到root下
 WORKDIR /root
 RUN echo 'cd /webapp\nbundle install\nbundle exec jekyll serve' > app.sh && chmod 755 app.sh
-# 生成启动文件
-RUN cat sshd.sh nginx-daemon.sh app.sh > bootstrap.sh && chmod 755 bootstrap.sh
+# 生成自定义启动文件
+RUN cat sshd.sh nginx-daemon.sh app.sh > bootstrap.sh
 
 ENTRYPOINT ["/bin/bash", "/root/bootstrap.sh"]
 
